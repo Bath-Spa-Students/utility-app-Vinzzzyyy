@@ -1,0 +1,110 @@
+print("Welcome to Vinz's Gym Vending Machine")#A welcome message
+
+import time#the time library is imported to put delay effects
+
+def print_with_delay(text, sleep=0.04):#a function effect to put delays in the text
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(sleep)
+#A nested dictionary is created to display the items of the vending machine. I divided the items in 3 categories
+#mainly the 'Snacks' 'Drinks' and 'Energydrink' for the user to chose from.
+menu = {
+    'Snacks': {
+        'A1': {'item': 'Lays Chips', 'price': 1.5, 'stock': 6},
+        'A2': {'item': 'Nutrition Bar', 'price': 3.0, 'stock': 5},
+        'A3': {'item': 'Protein Bar', 'price': 5.0, 'stock': 8},
+    },
+    'Drinks': {
+        'B1': {'item': 'Coke Zero', 'price': 3.0, 'stock': 3},
+        'B2': {'item': 'Water', 'price': 1.50, 'stock': 6},
+        'B3': {'item': 'Juice', 'price': 3.0, 'stock': 2},
+    },
+    'Energydrink': {
+        'C1': {'item': 'Prime Energy Drink', 'price': 5.0, 'stock': 5},
+        'C2': {'item': 'Monster Energy Drink', 'price': 5.0, 'stock': 7},
+        'C3': {'item': 'Kombucha Healthy Drink', 'price': 3.0, 'stock': 9},
+        'C4': {'item': 'Gatorade', 'price': 5.0, 'stock': 5},
+    }
+}
+
+def display_menu(category):#function to display the menu along with the 3 categories
+    print(f"\nHere's our menu {category}:")
+    for code, item in menu[category].items():
+        print(f"\t{code}: {item['item']} -- Price: ${item['price']} | Stock: {item['stock']}")
+
+def get_user_choice():#The program asks the user to choose from which category would they like to buy 
+    while True:
+        print_with_delay("What would you like to buy? \nSnacks, Drinks, Energydrink ")
+        choice = input()
+        if choice in menu:
+            return choice
+        else:
+            print("\nPlease select from the available categories 'Snacks', 'Drinks', 'Energydrink'")
+
+def get_user_item(category):#a function to ask the user for the code of the item that they would like to buy
+    while True:
+        print_with_delay("Enter the Code of item you wish to purchase: ")
+        code = input()
+        if code in menu[category]:
+            return menu[category][code]
+        else:
+            print("\tPlease enter a valid code")
+
+def get_suggestion(category):#a function to suggest the user what would go well with their chosen item
+    if category == 'Snacks':
+        return menu['Drinks']['B1']
+    elif category == 'Drinks':
+        return menu['Snacks']['A1']
+    elif category == 'Energydrink':
+        return menu['Snacks']['A3']
+    elif category == 'Snacks':
+        return menu['Drinks']['B3']
+    elif category == 'Drinks':
+        return menu['Energydrink']['C3']
+    elif category == 'Energydrink':
+        return menu['Snacks']['A2']
+
+def get_recommendation():#a function that tells that user what would be the best combo for their order
+    while True:
+        print_with_delay(f"A {suggestion['item']} would go well with your {purchased['item']} for $ {suggestion['price']}\nWould you like to buy it as well? Please type 'yes' or 'no':")
+        recommendation = input()
+        if recommendation == 'yes':
+            print(f"\n 1 {purchased['item']} for $ {purchased['price']}")
+            print(f"\n 1 {suggestion['item']} for $ {suggestion['price']}")
+            purchased['price'] += suggestion['price']
+            break
+        elif recommendation == 'no':
+            print("Thank you very much for your purchase")
+            break
+        else:
+            print(f"\n\tPlease enter 'yes' or 'no'")
+
+def process_payment():#a function that processes the payment system for the user. It can also give back the change 
+    while True:
+        try:
+            print_with_delay(f"Your total will be $ {purchased['price']}\nPlease Pay: $")
+            cash = float(input())
+            price = purchased['price']
+            change = price - cash
+            if cash >= price:
+                change = cash - price
+                print(f"\n\tYour item will be served soon\n\t 1 {purchased['item']} for $ {purchased['price']}")
+                print_with_delay(f"\nYour items have been dispensed, please collect them. Don't forget to get your change of $ {change:.2f}")
+                suggestion = input("\n\tWould you like to buy more? Please type 'yes' or 'no':")
+                if suggestion == 'yes':
+                    break
+                elif suggestion == 'no':
+                    print_with_delay(f"\nThanks for buying in Vinz's Vending Machine, please come again soon!")
+                    exit()
+            else:
+                print(f"\nYou don't have enough credit $ {change}. Please insert more $")
+        except ValueError:
+            print("\nInvalid input. Please enter a valid amount.")
+#Main program that runs the vending machine
+while True:#a program that allows it to enter a continous loop where it interacts with the user.
+    category = get_user_choice()
+    display_menu(category)
+    purchased = get_user_item(category)
+    suggestion = get_suggestion(category)
+    get_recommendation()
+    process_payment()
